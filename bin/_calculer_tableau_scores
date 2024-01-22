@@ -1,0 +1,51 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _calculer_tableau_scores"
+  echo ""
+  echo "Script qui calcule le tableau des meilleurs scores."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+# Si jamais le répertoire pour stocker les scores généraux
+# n'existe pas, on le créé
+mkdir -p $SCORES_GENERAUX_PATH
+# Si il existe déjà des fichiers scores dans ce répertoire,
+# on les supprime (on va les recalculer)
+rm -f $SCORES_GENERAUX_PATH/*
+
+# Pour chaque répertoire de joueur dans le répertoire des parties
+for partie_joueur in $PARTIES_PATH/*; do
+  $debug && echo "Répertoire de joueur : $partie_joueur"
+
+  # Si il s'agit bien d'un répertoire
+  if [[ -d $partie_joueur ]]; then
+
+    # Le nom du joueur en cours de traitement est le nom du répertoire
+    nom_joueur=$(basename $partie_joueur)
+
+    $debug && echo "Calcul des scores pour \"$nom_joueur\""
+    # On lance le script qui calcule les scores pour le joueur :
+    $PROJET_BIN/_calculer_scores_joueur $nom_joueur
+
+    # Maintenant qu'on a calculé les scores pour le joueur,
+    # on devrait trouver des fichiers scores dans le répertoire à son nom
+    # dans le répertoire des scores :
+    for fichier_score in $SCORES_PATH/$nom_joueur/*; do
+      # Si il s'agit bien d'un fichier :
+      if [[ -f $fichier_score ]]; then
+        # Le nom de la difficulté pour laquelle ce fichier stocke les scores est le nom du fichier :
+        difficulte=$(basename $fichier_score)
+
+        # Pour chaque ligne du fichier (chaque score de chaque partie) :
+        cat $fichier_score | while read ligne_score; do 
+          # On écrit la ligne dans le fichier de scores généraux pour la bonne
+          # difficulté en rajoutant le nom du joueur en fin de ligne
+          echo "$ligne_score - Joueur : $nom_joueur" >> $SCORES_GENERAUX_PATH/$difficulte
+        done
+      fi
+    done
+  fi
+done

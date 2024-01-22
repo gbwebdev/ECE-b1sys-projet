@@ -1,0 +1,86 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: menu"
+  echo ""
+  echo "Menu du jeu de QCM."
+  echo "Il s'agit du point d'entrée du jeu."
+  echo "Les utilisateurs ne peuvent passer que par ce script."
+}
+
+export PROJET_ROOT=/home/prof/projet
+# Le seul défaut de cette méthode est que si vous déplacez votre projet, il faut penser à changer la valeur de la variable
+# On pourrait faire :
+# export PROJET_ROOT=$(realpath $(dirname $0)/..)
+#     dirname permet d'obtenir le chemin du répertoire parent du chemin qu'on lui passe en paramètre
+#     Donc dirname $0 permet d'obtenir le chemin du répertoire qui contient le script (chemin de bin)
+#     realpath permet d'obtenir le chemin absolu de n'importe quel chemin linux
+#     Donc realpath $(dirname $0)/.. permet d'obtenir le chemin absolu du répertoire projet
+# Mais c'est déjà bien plus que ce que je vous demandais ;-)
+
+
+export PROJET_BIN=${PROJET_ROOT}/bin
+export PROJET_ETC=${PROJET_ROOT}/etc
+export PROJET_LIB=${PROJET_ROOT}/lib
+export PROJET_SHARE=${PROJET_ROOT}/share
+export PROJET_VAR=${PROJET_ROOT}/var
+
+export QUESTIONS_PATH=${PROJET_SHARE}/questions
+export PARTIES_PATH=${PROJET_VAR}/parties
+export SCORES_PATH=${PROJET_VAR}/scores
+export SCORES_GENERAUX_PATH=${PROJET_VAR}/scores-generaux
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+# Comme proposé en classe, nous utilisons la variable d'environnement $USER
+# pour déterminer facilement un nom unique pour chaque joueur.
+export NOM_JOUEUR=$USER
+
+while /bin/true; do
+
+  $debug || clear
+  # On demande au joueur de choisir sa réponse
+  select choix in "Nouvelle partie" "Reprendre partie" "Afficher mes scores" "Afficher le tableau des scores" "Quitter"; do
+    # En fonction du choix, on appelle le script adapté.
+    case $choix in
+      "Nouvelle partie")
+        $debug || clear
+        $PROJET_BIN/_nouvelle_partie
+        read -p "Appuyez sur une touche quand vous êtes prêt à continuer"
+        break
+        ;;
+
+      "Reprendre partie")
+        $debug || clear
+        $PROJET_BIN/_reprendre_partie
+        read -p "Appuyez sur une touche quand vous êtes prêt à continuer"
+        break
+        ;;
+      
+      "Afficher mes scores")
+        $debug || clear
+        $PROJET_BIN/_afficher_scores_joueur $NOM_JOUEUR
+        read -p "Appuyez sur une touche quand vous êtes prêt à continuer"
+        break
+        ;;
+      
+      "Afficher le tableau des scores")
+        $debug || clear
+        $PROJET_BIN/_afficher_tableau_scores
+        read -p "Appuyez sur une touche quand vous êtes prêt à continuer"
+        break
+        ;;
+
+      "Quitter")
+        echo "A bientôt !"
+        exit 0
+        ;;
+
+      *)
+        echo "Choix invalide"
+        ;;
+    esac
+
+  done;
+done;

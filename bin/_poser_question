@@ -1,0 +1,69 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _poser_question CHEMIN_FICHIER_QUESTION CHEMIN_PARTIE_EN_COURS"
+  echo "  CHEMIN_FICHIER_QUESTION: Le chemin du fichier \"question\" (dans share)"
+  echo "  CHEMIN_PARTIE_EN_COURS: Le chemin du répertoire (dans var) de la partie en cours"
+  echo ""
+  echo "Script qui pose une question, propose les différents choix de réponse possible,"
+  echo "  récupère la réponse de l'utilisateur et vérifie si elle est correcte ou non."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+
+# Pour plus de lisibilité, on récupère les paramètres et on les mets dans des variables au nom clair :
+chemin_fichier_question=$1
+chemin_partie_en_cours=$2
+
+
+$debug || clear
+
+if [[ ! -f $chemin_fichier_question ]]; then
+  # Si il n'existe pas un fichier question, on quitte avec une erreur
+  echo "ERREUR : le premier paramètre n'est pas un chemin vers un fichier"
+  exit 1
+fi
+
+# On vérifie que les paramètres passés sont cohérents :
+if [[ ! -d $chemin_partie_en_cours ]]; then
+  # Si le chemin $chemin_partie_en_cours ne pointe pas vers un répertoire, on quitte avec une erreur
+  echo "ERREUR : le second paramètre n'est pas un chemin vers un répertoire valide"
+  exit 1
+fi
+
+
+# On prépare le chemin du fichier de resultat
+nom_question=$(basename $chemin_fichier_question)
+chemin_fichier_resultat=$chemin_partie_en_cours/$nom_question
+
+# On récupère la question (la première ligne du fichier) :
+question=$(head -n 1 $chemin_fichier_question)
+ligne_bonne_reponse=$(grep '#bonneReponse' $chemin_fichier_question)
+bonne_reponse=$(echo $ligne_bonne_reponse | sed 's| #bonneReponse||')
+
+# On récupère les choix possibles et on les stock dans un array (solution donnée dans l'énnoncé)
+readarray -t choix_possibles < <(tail -n+2 $chemin_fichier_question | sed 's| #bonneReponse||')
+
+# On pose la question
+echo $question
+
+# On demande au joueur de choisir sa réponse
+select choix in "${choix_possibles[@]}"; do
+  # On vérifie que la réponse donnée est valable
+  if [[ -z $choix ]]; then
+    echo "Choix invalide, veuillez réessayer."
+  else
+    break
+  fi
+done;
+
+# On vérifie si la réponse est bonne
+if [[ "$choix" == "$bonne_reponse" ]]; then
+  echo "Bonne réponse !"
+  echo '1' > $chemin_fichier_resultat
+else
+  echo "Oups, c'est faux !"
+  echo '0' > $chemin_fichier_resultat
+fi

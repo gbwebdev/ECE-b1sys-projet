@@ -1,0 +1,44 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _nouvelle_partie"
+  echo ""
+  echo "Lance une nouvelle partie du jeu de QCM (préparation de l'environnement, puis appel"
+  echo "de la fonction d'enchainement de questions)."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+# Chaque sous répertoire du répertoire "share/questions" est un niveau de difficulte.
+# Pour obtenir la liste des difficultes disponibles,
+# on peut donc tout simplement lister les sous-répertoires de share/questions :
+difficultes_disponibles=$(ls $QUESTIONS_PATH)
+
+echo "Veuillez choisir un niveau de difficulté :"
+select difficulte_choisie in $difficultes_disponibles; do
+  if [[ -z  $difficulte_choisie ]]; then
+    echo "Choix invalide."
+  else
+    echo "Vous avez choisi la difficulte : $difficulte_choisie"
+    break
+  fi
+done
+
+# On utilise la date et l'heure à la seconde pour identifier une partie
+# Cela permet de s'assurer qu'elle est unique, et de pouvoir les retrouver
+# et de les identifier facilement.
+# On utilise le format à l'américaine pour pouvoir les trier par ordre alphabetique / chronologique facilement
+nom_partie_en_cours=$(date +%Y-%m-%d_%H-%M-%S)
+
+chemin_partie_en_cours=$PARTIES_PATH/$NOM_JOUEUR/$nom_partie_en_cours
+
+echo "Nouvelle partie \"$nom_partie_en_cours\" pour le joueur $NOM_JOUEUR"
+
+##On créée le répertoire pour la partie qu'on démarre
+mkdir -p $chemin_partie_en_cours
+# On stocke le niveau de difficulté de la partie dans un fichier 'difficulte'
+echo $difficulte_choisie > $chemin_partie_en_cours/difficulte
+
+# On appelle le script "_enchainement_questions"
+$PROJET_BIN/_enchainement_questions $chemin_partie_en_cours $difficulte_choisie

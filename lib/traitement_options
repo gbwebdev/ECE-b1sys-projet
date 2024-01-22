@@ -1,0 +1,17 @@
+option_debug=false
+for arg in "$@"; do
+  case $arg in
+    -h|--help)
+      afficher_help
+      exit 0
+      ;;
+    -d|--debug)
+      option_debug=true
+      ;;
+  esac
+done
+
+# Si l'option debug n'a pas déjà été appliquée, ou qu'elle est à "false", on l'applique :
+if [[ -z $debug || "$debug" = "false" ]]; then
+  export debug=$option_debug
+fi

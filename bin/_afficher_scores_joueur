@@ -1,0 +1,36 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _afficher_scores_joueur NOM_DU_JOUEUR"
+  echo "  NOM_DU_JOUEUR : Le nom du joueur dont on veut afficher les scores"
+  echo ""
+  echo "Script qui affiche l'historique des scores d'un joeur."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+nom_joueur=$1
+
+# On lance le script qui calcule les scores pour le joueur :
+$PROJET_BIN/_calculer_scores_joueur $nom_joueur
+
+if [[ -d $SCORES_PATH/$nom_joueur ]]; then
+  nombre_fichiers_score_pour_joueur=$(ls -1 $SCORES_PATH/$nom_joueur | wc -l)
+  $debug && echo "nombre_fichiers_score_pour_joueur \"$nom_joueur\" : $nombre_fichiers_score_pour_joueur"
+  
+  # S'il existe des parties dans ce répertoire
+  if [[ $nombre_fichiers_score_pour_joueur -gt 0 ]]; then
+    for fichier_score in $SCORES_PATH/$nom_joueur/* ; do
+      difficulte=$(basename $fichier_score)
+      echo ""
+      echo "Scores pour le niveau de difficulté \"$difficulte\" :"
+      sort $fichier_score
+      echo ""
+    done
+  else
+    echo "Désolé, le joueur \"$nom_joueur\" n'a terminé aucune partie : il n'y a pas de score à afficher"
+  fi
+else
+  echo "Désolé, le joueur \"$nom_joueur\" n'a terminé aucune partie : il n'y a pas de score à afficher"
+fi

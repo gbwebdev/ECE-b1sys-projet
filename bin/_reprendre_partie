@@ -1,0 +1,38 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _reprendre_partie"
+  echo ""
+  echo "Script qui reprend une partie en cours."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+parties_joueur=$PARTIES_PATH/$NOM_JOUEUR
+
+# On vérifie qu'il existe un répertoire pour ce joueur
+if [[ -d $parties_joueur ]]; then
+  nombre_parties_pour_joueur=$(ls -l $parties_joueur/* | wc -l)
+  # S'il existe des parties dans ce répertoire
+  if [[ $nombre_parties_pour_joueur -gt 0 ]]; then
+
+    # On récupère le répertoire de la dernière partie
+    derniere_partie=$(ls -1 $parties_joueur/ | tail -n1)
+    chemin_derniere_partie=$parties_joueur/$derniere_partie
+
+    # S'il n'existe PAS déjà de fichier score pour cette partie, c'est qu'on peut la reprendre
+    if [[ ! -f $chemin_derniere_partie/score ]]; then
+      # On récupère la difficulté de la dernière partie
+      difficulte=$(cat $chemin_derniere_partie/difficulte)
+      # On reprend la partie :
+      $PROJET_BIN/_enchainement_questions $chemin_derniere_partie $difficulte
+    else
+      echo "Désolé, la dernière partie a déjà été terminée."
+    fi
+  else
+    echo "Désolé, vous n'avez encore jamais joué de partie."
+  fi
+else
+  echo "Désolé, vous n'avez encore jamais joué de partie."
+fi

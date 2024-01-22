@@ -1,0 +1,69 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _calculer_scores_joueur NOM_DU_JOUEUR"
+  echo "  NOM_DU_JOUEUR : Le nom du joueur dont on veut calculer les scores"
+  echo ""
+  echo "Script qui calcule l'historique des scores d'un joeur."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+nom_joueur=$1
+
+repertoire_parties_joueur=$PARTIES_PATH/$nom_joueur
+repertoire_scores_joueur=$SCORES_PATH/$NOM_JOUEUR/
+
+# On vérifie qu'il existe un répertoire pour ce joueur
+if [[ -d $repertoire_parties_joueur ]]; then
+  nombre_parties_pour_joueur=$(ls -1 $repertoire_parties_joueur | wc -l)
+
+  $debug && echo "nombre_parties_pour_joueur: $nombre_parties_pour_joueur"
+
+  # S'il existe des parties dans ce répertoire
+  if [[ $nombre_parties_pour_joueur -gt 0 ]]; then
+
+    # On créé le répertoire pour stocker les scores du joueur
+    # (grace au -p, même s'il existe déjà, on n'aura pas d'erreurs)
+    mkdir -p $repertoire_scores_joueur
+    # On supprime tous les fichiers de score existants (on va tous les re-créer)
+    rm -f $repertoire_scores_joueur/*
+
+    for partie in $repertoire_parties_joueur/*; do
+
+      if [[ -f $partie/score ]]; then
+        # Si il existe un fichier score pour cette partie, on stocke le score dans un variable
+        score=$(cat $partie/score)
+      else
+        # Si non, on passe à l'itération suivante (partie non terminée)
+        continue
+      fi
+
+      if [[ -f $partie/difficulte ]]; then
+        # Si il existe un fichier difficulté pour cette partie, on stocke la difficulté dans un variable
+        difficulte=$(cat $partie/difficulte)
+      else
+        # Sinon, ce n'est pas normal
+        echo "Erreur : il manque le fichier difficulte pour la partie $partie"
+        exit 1
+      fi
+      
+      nom_partie=$(basename $partie)
+      # On écrit le score et la partie dans le fichier de score pour notre joueur,
+      # pour le niveau de difficulté qui va bien
+      echo "Score: $score% - Partie : $nom_partie" >> $repertoire_scores_joueur/$difficulte
+
+    done
+
+    # A ce stade, on a écrit une ligne pour chaque partie terminée dans un fichier portant
+    # le nom de la difficulté, dans un répertoire au nom du joeur.
+    # Pour afficher les scores des joueurs, on n'a qu'à afficher le contenu de chaque fichier...
+    # En le triant par orde de score croissant.
+
+  else
+    echo "Désolé, le joueur \"$nom_joueur\" n'a encore jamais joué de partie."
+  fi
+else
+  echo "Désolé, le joueur \"$nom_joueur\" n'a encore jamais joué de partie."
+fi

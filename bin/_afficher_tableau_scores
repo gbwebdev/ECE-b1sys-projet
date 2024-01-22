@@ -1,0 +1,27 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _afficher_tableau_scores"
+  echo ""
+  echo "Script qui affiche le tableau des meilleurs scores."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+$PROJET_BIN/_calculer_tableau_scores
+
+nombre_fichiers_scores_generaux=$(ls -1 $SCORES_GENERAUX_PATH | wc -l)
+$debug && echo "nombre_fichiers_scores_generaux: $nombre_fichiers_scores_generaux"
+# S'il existe des parties dans ce répertoire
+if [[ $nombre_fichiers_scores_generaux -gt 0 ]]; then
+  for fichier_score in $SCORES_GENERAUX_PATH/* ; do
+    difficulte=$(basename $fichier_score)
+    echo ""
+    echo "Cinq meilleurs scores pour le niveau de difficulté \"$difficulte\" :"
+    sort $fichier_score | head -n 5
+    echo ""
+  done
+else
+  echo "Désolé: il n'y a pas de score à afficher"
+fi
