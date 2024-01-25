@@ -4,7 +4,7 @@
 
 Pour jouer, vous devez appartenir au groupe `QCM-joueur`.
 
-Il vous suffit de lancer le script `bin/menu`.
+Il vous suffit de lancer le script [bin/menu](bin/menu).
 
 ## Documentation administrateur
 
@@ -12,7 +12,7 @@ Il vous suffit de lancer le script `bin/menu`.
 
 Vous devez appartenir au groupe `QCM-admins`
 
-Il vous suffit de créer un répertoire dans `share/questions`.
+Il vous suffit de créer un répertoire dans [share/questions](share/questions).
 
 ### Pour ajouter un niveau
 
