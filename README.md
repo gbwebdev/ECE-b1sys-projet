@@ -20,7 +20,7 @@ Vous pouvez aussi passer par le script [bin/ajout_questions](bin/ajout_questions
 
 Vous devez appartenir au groupe `QCM-admins`
 
-Il vous suffit de créer un répertoire dans [share/questions/<<le niveau de difficulte>>/](share/questions/).
+Il vous suffit de créer un répertoire dans [share/questions/LE_NIVEAU_DE_DIFFICULTE/](share/questions/).
 
 Vous pouvez aussi passer par le script [bin/ajout_questions](bin/ajout_questions), accessible via le menu.
 
@@ -28,7 +28,7 @@ Vous pouvez aussi passer par le script [bin/ajout_questions](bin/ajout_questions
 
 Vous devez appartenir au groupe `QCM-admins`
 
-Il vous suffit de créer un fichier dans `share/questions/<<le niveau de difficulte>>/<<le niveau>>` :
+Il vous suffit de créer un fichier dans `share/questions/LE_NIVEAU_DE_DIFFICULTE/LE_NIVEAU` :
 - La première ligne est l'intitulé de la question
 - Les lignes suivantes sont les choix de réponses possibles
 - La ligne contenant la bonne réponse doit se terminer par " #bonneReponse"
