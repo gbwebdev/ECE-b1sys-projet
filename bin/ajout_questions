@@ -1,0 +1,101 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: ajout_questions"
+  echo ""
+  echo "Script qui permet d'ajouter des questions au jeu de QCM."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+parties_joueur=$PARTIES_PATH/$NOM_JOUEUR
+
+# Chaque sous répertoire du répertoire "share/questions" est un niveau de difficulte.
+# Pour obtenir la liste des difficultes disponibles,
+# on peut donc tout simplement lister les sous-répertoires de share/questions :
+difficultes_disponibles=$(ls $QUESTIONS_PATH)
+
+echo "Pour quel niveau de difficulté voulez-vous aujouter une (ou des) question(s) :"
+# On propose de choisir parmi la liste des niveaux de difficulté possibles,
+# et on ajoute la possibilité d'ajouter un niveau de difficulté.
+select difficulte_choisie in $difficultes_disponibles "Ajouter un niveau de difficulte"; do
+
+  if [[ -z  $difficulte_choisie ]]; then
+    echo "Choix invalide."
+  else
+    # Si l'utilisateur a choisi d'ajouter un niveau de difficulté
+    if [[ "$difficulte_choisie" == "Ajouter un niveau de difficulte" ]]; then
+      # On demande le nom du niveau de difficulté à ajouter
+      read -p "Donner le nom du niveau de difficulté à ajouter : " difficulte_choisie
+      # On créé le niveau (tout simplement en créant le répertoire)
+      mkdir $QUESTIONS_PATH/$difficulte_choisie
+    fi
+    echo "Vous avez choisi la difficulte : $difficulte_choisie"
+    break
+  fi
+done
+
+# Chaque sous répertoire du répertoire "share/questions/<le niveau de diffuculte>" est un niveau.
+# Pour obtenir la liste des niveaux disponibles,
+# on peut donc tout simplement lister les sous-répertoires de share/questions/<le niveau de diffuculte> :
+niveaux_disponibles=$(ls "$QUESTIONS_PATH/$difficulte_choisie")
+
+echo "Pour quel niveau voulez-vous aujouter une (ou des) question(s) :"
+# On propose de choisir parmi la liste des niveaux possibles,
+# et on ajoute la possibilité d'ajouter un niveau.
+select niveau_choisi in $niveaux_disponibles "Ajouter un niveau"; do
+  if [[ -z  $niveau_choisi ]]; then
+    echo "Choix invalide."
+  else
+    # Si l'utilisateur a choisi d'ajouter un niveau
+    if [[ "$niveau_choisi" == "Ajouter un niveau" ]]; then
+      read -p "Donner le nom du niveau à ajouter : " niveau_choisi
+      # On créé le niveau (tout simplement en créant le répertoire)
+      mkdir "$QUESTIONS_PATH/$difficulte_choisie/$niveau_choisi"
+    fi
+    echo "Vous avez choisi le niveau : $niveau_choisi"
+    break
+  fi
+done
+
+chemin_niveau="$QUESTIONS_PATH/$difficulte_choisie/$niveau_choisi"
+
+# On récupère le numéro de la dernière question pour le niveau choisi.
+# Pour ça, on liste les fichiers dans le répertoire, et on prend le dernier de la liste
+# Si jamais la liste est vide, on utilise 0
+numero_prochaine_question=$(ls -1 "$chemin_niveau" | tail -n1 || 0)
+
+# On veut rentrer dans la boucle au moins une fois
+continuer_ajouter_questions=oui
+
+# Tant que l'utilisateur veut ajouter des questions
+while [[ "$continuer_ajouter_questions" == "oui" ]]; do
+  # On incrémente le numéro de la question
+  numero_prochaine_question=$(($numero_prochaine_question+1))
+
+  echo "Veuillez saisir l'intitulé de la question :"
+  read question
+  echo $question >> "$chemin_niveau/$numero_prochaine_question"
+
+  # On veut rentrer dans la boucle au moins une fois
+  continuer_ajouter_choix_reponses=oui
+  while [[ "$continuer_ajouter_choix_reponses" == "oui" ]]; do
+    echo "Veuillez saisir une réponse possible :"
+    read choix_reponse_possible
+
+    echo "S'agit-il de la bonne réponse ?"
+    select bonne_reponse in "oui" "non"; do break; done;
+    if [[ "$bonne_reponse" == "oui" ]]; then
+      # Si il s'agit de la bonne réponse, on ajoute "#bonneReponse" à la ligne
+      choix_reponse_possible="$choix_reponse_possible #bonneReponse"
+    fi
+    echo "$choix_reponse_possible" >> "$chemin_niveau/$numero_prochaine_question"
+
+    echo "Voulez-vous ajouter d'autres réponses possibles ?"
+    select continuer_ajouter_choix_reponses in "oui" "non"; do break; done;
+  done
+
+  echo "Voulez-vous ajouter d'autres questions ?"
+  select continuer_ajouter_questions in "oui" "non"; do break; done;
+done

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+afficher_help() {
+  echo "Utilisation: _enchainement_niveaux CHEMIN_PARTIE_EN_COURS DIFFICULTE"
+  echo "  CHEMIN_PARTIE_EN_COURS: Le chemin du répertoire (dans var) de la partie en cours"
+  echo "  DIFFICULTE: Le niveau de difficulté de la partie en cours"
+  echo ""
+  echo "Script qui enchaine les niveaux pour une partie."
+}
+
+# On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
+source $PROJET_LIB/traitement_options
+
+# Pour plus de lisibilité, on récupère les paramètres et on les mets dans des variables au nom clair :
+chemin_partie_en_cours=$1
+difficulte=$2
+
+# On vérifie que les paramètres passés sont cohérents :
+if [[ ! -d $chemin_partie_en_cours ]]; then
+  # Si le chemin $chemin_partie_en_cours ne pointe pas vers un répertoire, on quitte avec une erreur
+  echo "ERREUR : le premier paramètre n'est pas un chemin vers un répertoire valide"
+  exit 1
+fi
+
+if [[ ! -d $QUESTIONS_PATH/$difficulte || -z $difficulte ]]; then
+  # Si il n'existe pas un répertoire de difficulté correspondant à la difficultée passée en paramètre,
+  # ou que la difficulté est vide, on quitte avec une erreur
+  echo "ERREUR : le second paramètre n'est pas un niveau de difficulté valide"
+  exit 1
+fi
+
+chemin_repertoire_niveaux=$QUESTIONS_PATH/$difficulte
+
+score=0
+
+# Pour chaque niveau disponible pour ce niveau de difficulté :
+for niveau in "$chemin_repertoire_niveaux"/*; do
+
+  # On regarde tout d'abord si le joueur y a déjà répondu :
+  nom_niveau=$(basename "$niveau")
+  $debug && echo "Nom niveau : $nom_niveau"
+  chemin_niveau_en_cours="$chemin_partie_en_cours/$nom_niveau"
+  chemin_fichier_resultat="$chemin_niveau_en_cours/score"
+  mkdir -p "$chemin_partie_en_cours/$nom_niveau/"
+  if [[ ! -f "$chemin_fichier_resultat" ]]; then
+    # Si il n'y a PAS déjà répondu (il n'existe pas encore de fichier au nom de cette question
+    # dans le répertoire de la partie en cours), on lance le niveau :
+    clear
+    echo ""
+    echo "  $nom_niveau"
+    echo ""
+    sleep 5 
+    $PROJET_BIN/_enchainement_questions "$chemin_niveau_en_cours" "$difficulte" "$nom_niveau"
+  fi
+
+  # On récupère le résultat qu'avait obtenu le joueur
+  resultat_niveau=$(cat "$chemin_fichier_resultat")
+  # On ajoute ce résultat au score de la partie
+  score=$((score+resultat_niveau))
+done
+
+# On calcule le score sous forme de pourcentage 
+nombre_niveaux=$(ls -1 "$chemin_repertoire_niveaux/" | wc -l)
+score_pourcent=$((score/nombre_niveaux))
+
+echo "Votre score pour la partie est de : $score_pourcent%"
+
+# On enregistre le score dans le répertoire de partie
+echo "$score_pourcent" > $chemin_partie_en_cours/score

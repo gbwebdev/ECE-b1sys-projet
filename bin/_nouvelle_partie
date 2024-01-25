@@ -41,4 +41,4 @@ mkdir -p $chemin_partie_en_cours
 echo $difficulte_choisie > $chemin_partie_en_cours/difficulte
 
 # On appelle le script "_enchainement_questions"
-$PROJET_BIN/_enchainement_questions $chemin_partie_en_cours $difficulte_choisie
+$PROJET_BIN/_enchainement_niveaux $chemin_partie_en_cours $difficulte_choisie

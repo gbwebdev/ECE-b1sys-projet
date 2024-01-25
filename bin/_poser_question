@@ -20,7 +20,7 @@ chemin_partie_en_cours=$2
 
 $debug || clear
 
-if [[ ! -f $chemin_fichier_question ]]; then
+if [[ ! -f "$chemin_fichier_question" ]]; then
   # Si il n'existe pas un fichier question, on quitte avec une erreur
   echo "ERREUR : le premier paramètre n'est pas un chemin vers un fichier"
   exit 1
@@ -35,16 +35,16 @@ fi
 
 
 # On prépare le chemin du fichier de resultat
-nom_question=$(basename $chemin_fichier_question)
+nom_question=$(basename "$chemin_fichier_question")
 chemin_fichier_resultat=$chemin_partie_en_cours/$nom_question
 
 # On récupère la question (la première ligne du fichier) :
-question=$(head -n 1 $chemin_fichier_question)
-ligne_bonne_reponse=$(grep '#bonneReponse' $chemin_fichier_question)
+question=$(head -n 1 "$chemin_fichier_question")
+ligne_bonne_reponse=$(grep '#bonneReponse' "$chemin_fichier_question")
 bonne_reponse=$(echo $ligne_bonne_reponse | sed 's| #bonneReponse||')
 
 # On récupère les choix possibles et on les stock dans un array (solution donnée dans l'énnoncé)
-readarray -t choix_possibles < <(tail -n+2 $chemin_fichier_question | sed 's| #bonneReponse||')
+readarray -t choix_possibles < <(tail -n+2 "$chemin_fichier_question" | sed 's| #bonneReponse||')
 
 # On pose la question
 echo $question
@@ -62,8 +62,8 @@ done;
 # On vérifie si la réponse est bonne
 if [[ "$choix" == "$bonne_reponse" ]]; then
   echo "Bonne réponse !"
-  echo '1' > $chemin_fichier_resultat
+  echo '1' > "$chemin_fichier_resultat"
 else
   echo "Oups, c'est faux !"
-  echo '0' > $chemin_fichier_resultat
+  echo '0' > "$chemin_fichier_resultat"
 fi

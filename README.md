@@ -2,9 +2,55 @@
 
 ## Documentation joueur
 
+Pour jouer, vous devez appartenir au groupe `QCM-joueur`.
+
+Il vous suffit de lancer le script `bin/menu`.
+
 ## Documentation administrateur
 
+### Pour ajouter un niveau de difficulté
+
+Vous devez appartenir au groupe `QCM-admins`
+
+Il vous suffit de créer un répertoire dans `share/questions`.
+
+Vous pouvez aussi passer par le script `ajout_questions`, accessible via le menu.
+
+### Pour ajouter un niveau
+
+Vous devez appartenir au groupe `QCM-admins`
+
+Il vous suffit de créer un répertoire dans `share/questions/<<le niveau de difficulte>>/`.
+
+Vous pouvez aussi passer par le script `ajout_questions`, accessible via le menu.
+
+### Pour ajouter une question
+
+Vous devez appartenir au groupe `QCM-admins`
+
+Il vous suffit de créer un fichier dans `share/questions/<<le niveau de difficulte>>/<<le niveau>>` :
+- La première ligne est l'intitulé de la question
+- Les lignes suivantes sont les choix de réponses possibles
+- La ligne contenant la bonne réponse doit se terminer par " #bonneReponse"
+
+Par exemple :
+```
+Quel fils de Zeus est le protecteur des marchands, des voyageurs et des voleurs ?
+Héphaïstos
+Apollon
+Hermès #bonneReponse
+Hestia
+```
+
+Vous pouvez aussi passer par le script `ajout_questions`, accessible via le menu.
+
 ## Documentation développeur
+
+### Scripts
+
+Les scripts sont intensément commentés.
+
+### Permissions
 
 La consigne demande que :
 - tous les membres du groupe QCM-joueurs puissent jouer au jeu
@@ -56,3 +102,117 @@ Donc, quand un joueur "joueurX" va lancer une nouvelle partie :
 - Le répertoire var/parties/joueurX appartient au joueur joueurX, et a pour groupe propriétaire "QCM-joueurs"
 - Les fichiers créés dans var/parties/joueurX ne seront modifiables que par "joueurX" et seront lisibles par tout le monde.
 - Seul "joueurX" peut supprimer son répertoire.
+
+
+sudo chgrp QCM-admins bin/ajout_questions
+sudo chmod ug+x bin/ajout_questions
+
+On utilise le sticky bit "SGID" pour que tout ce qui est créé dans share appartienne au groupe QCM-admins.
+
+
+```
+~/projet$ tree -pug .
+[drwxr-xr-x prof     prof    ]  .
+|-- [-rw-rw-r-- prof     prof    ]  README.md
+|-- [drwxr-x--- prof     QCM-joueurs]  bin
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _afficher_scores_joueur
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _afficher_tableau_scores
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _calculer_scores_joueur
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _calculer_tableau_scores
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _enchainement_niveaux
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _enchainement_questions
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _nouvelle_partie
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _poser_question
+|   |-- [-rwxr-x--- prof     QCM-joueurs]  _reprendre_partie
+|   |-- [-rwxrwxr-- prof     QCM-admins]  ajout_questions
+|   `-- [-rwxr-x--- prof     QCM-joueurs]  menu
+|-- [drwxrwxr-x prof     QCM-joueurs]  etc
+|-- [drwxr-x--- prof     QCM-joueurs]  lib
+|   `-- [-rwxr-x--- prof     QCM-joueurs]  traitement_options
+|-- [drwxr-sr-x prof     QCM-admins]  share
+|   `-- [drwxrwsr-x prof     QCM-admins]  questions
+|       |-- [drwxrwsr-x prof     QCM-admins]  difficile
+|       |   |-- [drwxrwsr-x prof     QCM-admins]  Niveau\ 1\ :\ Geographie
+|       |   |   |-- [-rw-rw-r-- prof     QCM-admins]  1
+|       |   |   |-- [-rw-rw-r-- prof     QCM-admins]  2
+|       |   |   `-- [-rw-rw-r-- prof     QCM-admins]  3
+|       |   |-- [drwxrwsr-x prof     QCM-admins]  Niveau\ 2\ :\ Histoire
+|       |   |   |-- [-rw-rw-r-- prof     QCM-admins]  1
+|       |   |   |-- [-rw-rw-r-- prof     QCM-admins]  2
+|       |   |   `-- [-rw-rw-r-- prof     QCM-admins]  3
+|       |   `-- [drwxrwsr-x prof     QCM-admins]  Niveau\ 3\ :\ Informatique
+|       |       |-- [-rw-rw-r-- prof     QCM-admins]  1
+|       |       |-- [-rw-rw-r-- prof     QCM-admins]  2
+|       |       `-- [-rw-rw-r-- prof     QCM-admins]  3
+|       `-- [drwxrwsr-x prof     QCM-admins]  facile
+|           |-- [drwxrwsr-x prof     QCM-admins]  Niveau\ 1\ :\ Geographie
+|           |   |-- [-rw-rw-r-- prof     QCM-admins]  1
+|           |   |-- [-rw-rw-r-- prof     QCM-admins]  2
+|           |   |-- [-rw-rw-r-- prof     QCM-admins]  3
+|           |   `-- [-rw-rw-r-- prof     QCM-admins]  4
+|           |-- [drwxrwsr-x prof     QCM-admins]  Niveau\ 2\ :\ Histoire
+|           |   |-- [-rw-rw-r-- prof     QCM-admins]  1
+|           |   |-- [-rw-rw-r-- prof     QCM-admins]  2
+|           |   |-- [-rw-rw-r-- prof     QCM-admins]  3
+|           |   `-- [-rw-rw-r-- prof     QCM-admins]  4
+|           `-- [drwxrwsr-x prof     QCM-admins]  Niveau\ 3\ :\ Informatique
+|               |-- [-rw-rw-r-- prof     QCM-admins]  1
+|               |-- [-rw-rw-r-- prof     QCM-admins]  2
+|               `-- [-rw-rw-r-- prof     QCM-admins]  3
+`-- [drwxr-x--- prof     QCM-joueurs]  var
+    |-- [drwxrws--T prof     QCM-joueurs]  parties
+    |   |-- [drwxrwsr-x joueur2  QCM-joueurs]  bob
+    |   |   `-- [drwxrwsr-x joueur2  QCM-joueurs]  2024-01-25_22-17-03
+    |   |       |-- [drwxrwsr-x joueur2  QCM-joueurs]  Niveau\ 1\ :\ Geographie
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  1
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  2
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  3
+    |   |       |   `-- [-rw-rw-r-- joueur2  QCM-joueurs]  score
+    |   |       |-- [drwxrwsr-x joueur2  QCM-joueurs]  Niveau\ 2\ :\ Histoire
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  1
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  2
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  3
+    |   |       |   `-- [-rw-rw-r-- joueur2  QCM-joueurs]  score
+    |   |       |-- [drwxrwsr-x joueur2  QCM-joueurs]  Niveau\ 3\ :\ Informatique
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  1
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  2
+    |   |       |   |-- [-rw-rw-r-- joueur2  QCM-joueurs]  3
+    |   |       |   `-- [-rw-rw-r-- joueur2  QCM-joueurs]  score
+    |   |       |-- [-rw-rw-r-- joueur2  QCM-joueurs]  difficulte
+    |   |       `-- [-rw-rw-r-- joueur2  QCM-joueurs]  score
+    |   `-- [drwxrwsr-x joueur1  QCM-joueurs]  zoro
+    |       |-- [drwxrwsr-x joueur1  QCM-joueurs]  2024-01-25_22-14-13
+    |       |   |-- [drwxrwsr-x joueur1  QCM-joueurs]  Niveau\ 1\ :\ Geographie
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  1
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  2
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  3
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  4
+    |       |   |   `-- [-rw-rw-r-- joueur1  QCM-joueurs]  score
+    |       |   |-- [drwxrwsr-x joueur1  QCM-joueurs]  Niveau\ 2\ :\ Histoire
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  1
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  2
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  3
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  4
+    |       |   |   `-- [-rw-rw-r-- joueur1  QCM-joueurs]  score
+    |       |   |-- [drwxrwsr-x joueur1  QCM-joueurs]  Niveau\ 3\ :\ Informatique
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  1
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  2
+    |       |   |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  3
+    |       |   |   `-- [-rw-rw-r-- joueur1  QCM-joueurs]  score
+    |       |   |-- [-rw-rw-r-- joueur1  QCM-joueurs]  difficulte
+    |       |   `-- [-rw-rw-r-- joueur1  QCM-joueurs]  score
+    |       `-- [drwxrwsr-x joueur1  QCM-joueurs]  2024-01-25_22-15-52
+    |           |-- [drwxrwsr-x joueur1  QCM-joueurs]  Niveau\ 1\ :\ Geographie
+    |           |   `-- [-rw-rw-r-- joueur1  QCM-joueurs]  1
+    |           `-- [-rw-rw-r-- joueur1  QCM-joueurs]  difficulte
+    |-- [drwxrwsr-x prof     QCM-joueurs]  scores
+    |   |-- [drwxrwsr-x joueur2  QCM-joueurs]  bob
+    |   |   `-- [-rw-rw-r-- joueur2  QCM-joueurs]  facile
+    |   `-- [drwxrwsr-x joueur1  QCM-joueurs]  zoro
+    |       `-- [-rw-rw-r-- joueur1  QCM-joueurs]  facile
+    `-- [drwxrwsr-x prof     QCM-joueurs]  scores-generaux
+        |-- [-rw-rw-r-- joueur2  QCM-joueurs]  difficile
+        `-- [-rw-rw-r-- joueur2  QCM-joueurs]  facile
+
+31 directories, 69 files
+```

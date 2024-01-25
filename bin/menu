@@ -33,15 +33,23 @@ export SCORES_GENERAUX_PATH=${PROJET_VAR}/scores-generaux
 # On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
 source $PROJET_LIB/traitement_options
 
+echo "Veuillez saisir votre pseudo :"
+read NOM_JOUEUR
+
+
 # Comme proposé en classe, nous utilisons la variable d'environnement $USER
 # pour déterminer facilement un nom unique pour chaque joueur.
-export NOM_JOUEUR=$USER
+export NOM_JOUEUR
 
 while /bin/true; do
 
   $debug || clear
+
+  echo "Bonjour, $NOM_JOUEUR !"
+  echo "Que voulez-vous faire ?"
+  echo ""
   # On demande au joueur de choisir sa réponse
-  select choix in "Nouvelle partie" "Reprendre partie" "Afficher mes scores" "Afficher le tableau des scores" "Quitter"; do
+  select choix in "Nouvelle partie" "Reprendre partie" "Afficher mes scores" "Afficher le tableau des scores" "Ajouter des questions" "Quitter"; do
     # En fonction du choix, on appelle le script adapté.
     case $choix in
       "Nouvelle partie")
@@ -68,6 +76,13 @@ while /bin/true; do
       "Afficher le tableau des scores")
         $debug || clear
         $PROJET_BIN/_afficher_tableau_scores
+        read -p "Appuyez sur une touche quand vous êtes prêt à continuer"
+        break
+        ;;
+      
+      "Ajouter des questions")
+        $debug || clear
+        $PROJET_BIN/ajout_questions
         read -p "Appuyez sur une touche quand vous êtes prêt à continuer"
         break
         ;;

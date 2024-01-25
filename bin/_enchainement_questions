@@ -1,11 +1,12 @@
 #!/bin/bash
 
 afficher_help() {
-  echo "Utilisation: _enchainement_questions CHEMIN_PARTIE_EN_COURS DIFFICULTE"
+  echo "Utilisation: _enchainement_questions CHEMIN_PARTIE_EN_COURS DIFFICULTE NIVEAU"
   echo "  CHEMIN_PARTIE_EN_COURS: Le chemin du répertoire (dans var) de la partie en cours"
   echo "  DIFFICULTE: Le niveau de difficulté de la partie en cours"
+  echo "  NIVEAU: Le niveau à jouer"
   echo ""
-  echo "Script qui enchaine les questions pour une partie."
+  echo "Script qui enchaine les questions pour un niveau."
 }
 
 # On appelle la fonction de traitement des options qui est dans lib (car on l'utilise dans plusieurs scripts)
@@ -14,6 +15,7 @@ source $PROJET_LIB/traitement_options
 # Pour plus de lisibilité, on récupère les paramètres et on les mets dans des variables au nom clair :
 chemin_partie_en_cours=$1
 difficulte=$2
+niveau=$3
 
 # On vérifie que les paramètres passés sont cohérents :
 if [[ ! -d $chemin_partie_en_cours ]]; then
@@ -22,40 +24,44 @@ if [[ ! -d $chemin_partie_en_cours ]]; then
   exit 1
 fi
 
-if [[ ! -d $QUESTIONS_PATH/$difficulte || -z $difficulte ]]; then
-  # Si il n'existe pas un répertoire de difficulté correspondant à la difficultée passée en paramètre,
-  # ou que la difficulté est vide, on quitte avec une erreur
+if [[ ! -d "$QUESTIONS_PATH/$difficulte/$niveau" || -z $difficulte || -z $niveau ]]; then
+  # Si il n'existe pas un répertoire de niveau correspondant à la difficultée passée en paramètre,
+  # que la difficulté est vide, ou que le niveau est vide, on quitte avec une erreur
   echo "ERREUR : le second paramètre n'est pas un niveau de difficulté valide"
   exit 1
 fi
 
-chemin_repertoire_questions=$QUESTIONS_PATH/$difficulte
+chemin_repertoire_questions="$QUESTIONS_PATH/$difficulte/$niveau"
 
 score=0
 
 # Pour chaque question disponible pour ce niveau de difficulté :
-for question in $chemin_repertoire_questions/*; do
+for question in "$chemin_repertoire_questions"/*; do
 
   # On regarde tout d'abord si le joueur y a déjà répondu :
-  nom_question=$(basename $question)
-  chemin_fichier_resultat=$chemin_partie_en_cours/$nom_question
-  if [[ ! -f $chemin_fichier_resultat ]]; then
+  nom_question=$(basename "$question")
+  chemin_fichier_resultat="$chemin_partie_en_cours/$nom_question"
+  $debug && echo "chemin_fichier_resultat :$chemin_partie_en_cours/$nom_question"
+  if [[ ! -f "$chemin_fichier_resultat" ]]; then
     # Si il n'y a PAS déjà répondu (il n'existe pas encore de fichier au nom de cette question
     # dans le répertoire de la partie en cours), on pose la question :
-    $PROJET_BIN/_poser_question $question $chemin_partie_en_cours
+    $debug && echo "Question : |$question|"
+    $PROJET_BIN/_poser_question "$question" "$chemin_partie_en_cours"
   fi
 
   # On récupère le résultat qu'avait obtenu le joueur
-  resultat_question=$(cat $chemin_fichier_resultat)
+  resultat_question=$(cat "$chemin_fichier_resultat")
   # On ajoute ce résultat au score de la partie
   score=$((score+resultat_question))
 done
 
 # On calcule le score sous forme de pourcentage 
-nombre_questions=$(ls -l $chemin_repertoire_questions/* | wc -l)
+nombre_questions=$(ls -1 "$chemin_repertoire_questions/" | wc -l)
 score_pourcent=$((score*100/nombre_questions))
 
-echo "Votre score est de : $score_pourcent%"
+echo "Votre score pour ce niveau est de : $score_pourcent%"
+read -p "Appuyer sur une touche pour continuer"
 
 # On enregistre le score dans le répertoire de partie
-echo "$score_pourcent" > $chemin_partie_en_cours/score
+$debug && echo "Fichier score : $chemin_partie_en_cours/score"
+echo "$score_pourcent" > "$chemin_partie_en_cours/score"
