@@ -4,7 +4,7 @@
 
 Pour jouer, vous devez appartenir au groupe `QCM-joueur`.
 
-Il vous suffit de lancer le script `bin/menu`.
+Il vous suffit de lancer le script [bin/menu](bin/menu).
 
 ## Documentation administrateur
 
@@ -12,17 +12,17 @@ Il vous suffit de lancer le script `bin/menu`.
 
 Vous devez appartenir au groupe `QCM-admins`
 
-Il vous suffit de créer un répertoire dans `share/questions`.
+Il vous suffit de créer un répertoire dans [share/questions](share/questions).
 
-Vous pouvez aussi passer par le script `ajout_questions`, accessible via le menu.
+Vous pouvez aussi passer par le script [bin/ajout_questions](bin/ajout_questions), accessible via le menu.
 
 ### Pour ajouter un niveau
 
 Vous devez appartenir au groupe `QCM-admins`
 
-Il vous suffit de créer un répertoire dans `share/questions/<<le niveau de difficulte>>/`.
+Il vous suffit de créer un répertoire dans [share/questions/<<le niveau de difficulte>>/](share/questions/).
 
-Vous pouvez aussi passer par le script `ajout_questions`, accessible via le menu.
+Vous pouvez aussi passer par le script [bin/ajout_questions](bin/ajout_questions), accessible via le menu.
 
 ### Pour ajouter une question
 
@@ -42,7 +42,7 @@ Hermès #bonneReponse
 Hestia
 ```
 
-Vous pouvez aussi passer par le script `ajout_questions`, accessible via le menu.
+Vous pouvez aussi passer par le script [bin/ajout_questions](bin/ajout_questions), accessible via le menu.
 
 ## Documentation développeur
 
