@@ -18,7 +18,7 @@ Il vous suffit de créer un répertoire dans [share/questions](share/questions).
 
 Vous devez appartenir au groupe `QCM-admins`
 
-Il vous suffit de créer un répertoire dans `share/questions/<<le niveau de difficulte>>/`.
+Il vous suffit de créer un répertoire dans [share/questions/<<le niveau de difficulte>>/](share/questions).
 
 ### Pour ajouter une question
 
