@@ -2,9 +2,49 @@
 
 ## Documentation joueur
 
+Pour jouer, vous devez appartenir au groupe `QCM-joueur`.
+
+Il vous suffit de lancer le script `bin/menu`.
+
 ## Documentation administrateur
 
+### Pour ajouter un niveau de difficulté
+
+Vous devez appartenir au groupe `QCM-admins`
+
+Il vous suffit de créer un répertoire dans `share/questions`.
+
+### Pour ajouter un niveau
+
+Vous devez appartenir au groupe `QCM-admins`
+
+Il vous suffit de créer un répertoire dans `share/questions/<<le niveau de difficulte>>/`.
+
+### Pour ajouter une question
+
+Vous devez appartenir au groupe `QCM-admins`
+
+Il vous suffit de créer un fichier dans `share/questions/<<le niveau de difficulte>>/<<le niveau>>` :
+- La première ligne est l'intitulé de la question
+- Les lignes suivantes sont les choix de réponses possibles
+- La ligne contenant la bonne réponse doit se terminer par " #bonneReponse"
+
+Par exemple :
+```
+Quel fils de Zeus est le protecteur des marchands, des voyageurs et des voleurs ?
+Héphaïstos
+Apollon
+Hermès #bonneReponse
+Hestia
+```
+
 ## Documentation développeur
+
+### Scripts
+
+Les scripts sont intensément commentés.
+
+### Permissions
 
 La consigne demande que :
 - tous les membres du groupe QCM-joueurs puissent jouer au jeu
